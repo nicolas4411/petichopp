@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Histórico de Atendimentos - PetiChopp{% endblock %}
+
+{% block content %}
+<h2>📜 Histórico de Atendimentos</h2>
+
+<a href="{% url 'novo_atendimento' %}"
+    style="background: #007bff; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px;">➕ Registrar
+    Novo Atendimento</a>
+<br><br>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr style="background-color: #f2f2f2;">
+            <th>Data</th>
+            <th>Pet</th>
+            <th>Tutor</th>
+            <th>Serviços Executados</th>
+            <th>Valor Total</th>
+            <th>Observações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a in atendimentos %}
+        <tr>
+            <td>{{ a.data|date:"d/m/Y" }}</td>
+            <td><strong>{{ a.pet.nome }}</strong></td>
+            <td>{{ a.pet.dono }}</td>
+            <td>{{ a.servicos_descricao }}</td>
+            <td><strong>R$ {{ a.valor_total }}</strong></td>
+            <td>{{ a.observacoes|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">Nenhum atendimento registrado até o momento.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

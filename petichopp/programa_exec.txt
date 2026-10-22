@@ -1,0 +1,18 @@
+1_ criar ambiente de virtual 
+   python -m venv venv   (criar ambiente virtual)
+   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser (execute no power shell do windows se não da erro)
+   venv\Scripts\activate (ativar o ambiente)
+   deactivate  (fechar o venv quando terminar)
+   python manage.py runserver (abrir o projeto)
+
+2_ criar um arquivo txt para instalar as bibliotecas (requirements.txt)
+   em seguida instalar elas com o comando
+      pip install -r requirements.txt
+   
+   comando para enviar para outra pessoa, rodar no terminal o seu projeto onde vai conter apenas
+   as bibliotecas necessarias e compativeis com o projeto
+     pip freeze > requirements.txt
+     
+3_ comando para gerar o executavel, o venv ja deve estar ativo
+      pip install pyinstaller (preparando)
+      pyinstaller --onefile --windowed --collect-all reportlab camisas.py (gerando)

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>🛡️ Cadastrar Novo Administrador</h2>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="card p-4 shadow-sm mb-4">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nome Completo / Exibição:</label>
+                    <input type="text" name="first_name" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nome de Usuário (Login):</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">E-mail (opcional):</label>
+                    <input type="email" name="email" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Senha Inicial:</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-danger">Criar Administrador</button>
+        </form>
+    </div>
+
+    <h4>Administradores Cadastrados</h4>
+    <ul class="list-group">
+        {% for admin in administradores %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+                <strong>{{ admin.get_full_name|default:admin.username }}</strong> ({{ admin.username }})
+            </span>
+            <span class="badge bg-warning text-dark">Administrador</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">Nenhum administrador encontrado.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

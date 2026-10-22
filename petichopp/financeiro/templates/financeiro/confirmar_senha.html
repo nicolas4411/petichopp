@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 400px;">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h4 class="card-title mb-3">🔒 Acesso Restrito</h4>
+            <p class="text-muted">Digite sua senha de Administrador para acessar o Financeiro:</p>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger p-2">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="password" name="senha" class="form-control" placeholder="Senha do Admin" required
+                        autofocus>
+                </div>
+                <button type="submit" class="btn btn-warning w-100 fw-bold">Entrar no Financeiro</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

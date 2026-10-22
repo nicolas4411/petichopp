@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Painel Financeiro - PetiChopp{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>💰 Painel Financeiro (Dono)</h2>
+        <a href="{% url 'financeiro:cadastrar_despesa' %}" class="btn btn-danger fw-bold shadow-sm">
+            <i class="bi bi-dash-circle"></i> + Lançar Despesa / Gasto
+        </a>
+    </div>
+
+    <!-- FILTRO POR MÊS E ANO -->
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body p-3">
+            <form method="GET" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold mb-1"><i class="bi bi-calendar-month"></i> Mês:</label>
+                    <select name="mes" class="form-select">
+                        <option value="todos" {% if todos_meses_selecionado %}selected{% endif %}>Todos os Meses
+                        </option>
+                        {% for item in meses_lista %}
+                        <option value="{{ item.num }}" {% if item.selected %}selected{% endif %}>
+                            {{ item.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold mb-1"><i class="bi bi-calendar-event"></i> Ano:</label>
+                    <select name="ano" class="form-select">
+                        <option value="todos" {% if todos_anos_selecionado %}selected{% endif %}>Todos os Anos</option>
+                        {% for item in anos_lista %}
+                        <option value="{{ item.ano }}" {% if item.selected %}selected{% endif %}>
+                            {{ item.ano }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold w-100">
+                        <i class="bi bi-filter"></i> Filtrar
+                    </button>
+                    <a href="{% url 'financeiro:dashboard' %}" class="btn btn-outline-secondary w-100">
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CARDS DE RESUMO FINANCEIRO -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-success text-white shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase mb-1">Total de Entradas</h6>
+                    <h3 class="card-text fw-bold">R$ {{ total_entradas|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card bg-danger text-white shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase mb-1">Total de Saídas</h6>
+                    <h3 class="card-text fw-bold">R$ {{ total_saidas|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div
+                class="card {% if saldo_atual >= 0 %}bg-primary{% else %}bg-warning text-dark{% endif %} text-white shadow-sm border-0">
+                <div class="card-body">
+                    <h6 class="card-title text-uppercase mb-1">Saldo no Período</h6>
+                    <h3 class="card-text fw-bold">R$ {{ saldo_atual|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELA DE EXTRATO DE TRANSAÇÕES -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="m-0">📊 Extrato de Transações</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Vendedor / Responsável</th>
+                            <th>Pagamento</th>
+                            <th class="text-end">Valor (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if transacoes %}
+                        {% for t in transacoes %}
+                        <tr>
+                            <td>{{ t.data|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if t.tipo == 'ENTRADA' %}
+                                <span class="badge bg-success">Entrada</span>
+                                {% else %}
+                                <span class="badge bg-danger">Saída</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ t.descricao }}</td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    {{ t.vendedor.first_name|default:t.vendedor.username|default:"Sistema" }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ t.get_forma_pagamento_display }}
+                                </span>
+                            </td>
+                            <td
+                                class="text-end fw-bold {% if t.tipo == 'ENTRADA' %}text-success{% else %}text-danger{% endif %}">
+                                {% if t.tipo == 'ENTRADA' %}+{% else %}-{% endif %} R$ {{ t.valor|floatformat:2 }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Nenhuma transação encontrada para o período selecionado.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

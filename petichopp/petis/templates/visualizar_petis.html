@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Pets - PetiChopp{% endblock %}
+
+{% block content %}
+<h2>📋 Pets Cadastrados</h2>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr style="background-color: #f2f2f2;">
+            <th>Nome</th>
+            <th>Espécie / Raça</th>
+            <th>Idade</th>
+            <th>Tutor</th>
+            <th>Telefone</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pet in pets %}
+        <tr>
+            <td><strong>{{ pet.nome }}</strong></td>
+            <td>{{ pet.especie }} ({{ pet.raca }})</td>
+            <td>{{ pet.idade }} ano(s)</td>
+            <td>{{ pet.dono }}</td>
+            <td>{{ pet.telefone_dono }}</td>
+            <td>{% if pet.ativo %}🟢 Ativo{% else %}🔴 Inativo{% endif %}</td>
+            <td>
+                <a href="{% url 'editar_pet' pet.id %}">✏️ Editar</a> |
+                <a href="{% url 'alternar_status_pet' pet.id %}">
+                    {% if pet.ativo %}🚫 Desativar{% else %}✅ Ativar{% endif %}
+                </a> |
+                <a href="{% url 'deletar_pet' pet.id %}"
+                    onclick="return confirm('Deseja excluir permanentemente este pet?');" style="color: red;">🗑️
+                    Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">Nenhum pet ativo cadastrado até o momento.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

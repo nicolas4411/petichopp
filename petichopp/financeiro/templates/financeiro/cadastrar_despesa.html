@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+            <h4 class="m-0"><i class="bi bi-dash-circle"></i> Lançar Nova Despesa / Gasto</h4>
+            <a href="{% url 'financeiro:dashboard' %}" class="btn btn-sm btn-light fw-bold">Voltar ao Painel</a>
+        </div>
+        <div class="card-body p-4">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Descrição da Despesa:</label>
+                    <input type="text" name="descricao" class="form-control"
+                        placeholder="Ex: Compra de ração, Conta de Luz, Material de Limpeza" required autofocus>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Valor (R$):</label>
+                        <input type="number" step="0.01" name="valor" class="form-control" placeholder="0.00" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Data do Pagamento:</label>
+                        <input type="date" name="data" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Forma de Pagamento:</label>
+                    <select name="forma_pagamento" class="form-select" required>
+                        <option value="PIX">PIX</option>
+                        <option value="DINHEIRO">Dinheiro</option>
+                        <option value="CARTAO_DEBITO">Cartão de Débito</option>
+                        <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 fw-bold py-2 mt-2">Registrar Gasto</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

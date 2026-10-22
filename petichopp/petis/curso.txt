@@ -1,0 +1,42 @@
+criando super usuario = digitamos o comando para ir para a pasta raiz a primeira a ser criada
+  cd ..  
+  python manage.py createsuperuser
+    nome = daniel
+    email = danielferr13@yahoo.com
+    senha = 1980
+
+banco de dados = criamos as tabelas no modls.py do app
+
+informamos o django a cerca delas com os comandos
+  python manage.py makemigrations
+  python manage.py migrate
+
+importamos a tabela criada no modls do app para o admin do app
+
+  exp modls
+  from django.db import models
+  class Pet(models.Model):
+    nome = models.CharField(max_length=100)
+    especie = models.CharField(max_length=50)
+    dono = models.CharField(max_length=100)
+    ativo = models.BooleanField(default=True)  # Soft Delete: True (ativo) ou False (desativado)
+
+    def __str__(self):
+        return f"{self.nome} ({self.especie}) - Tutor: {self.dono}"
+ 
+  exp no admin.py
+    from django.contrib import admin
+    from .models import Pet
+
+    @admin.register(Pet)
+    class PetAdmin(admin.ModelAdmin):
+      # Colunas visíveis na tabela do painel
+      list_display = ('id', 'nome', 'especie', 'dono', 'ativo')
+    
+      # Filtro lateral (permite filtrar ativos/inativos e por espécie)
+      list_filter = ('ativo', 'especie')
+    
+      # Barra de pesquisa (busca por nome do pet ou do dono)
+      search_fields = ('nome', 'dono')
+ 
+  

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Pet - PetiChopp{% endblock %}
+
+{% block content %}
+<h2>✏️ Editar Dados do Pet</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <div>
+        <label>Nome do Pet:</label><br>
+        <input type="text" name="nome" value="{{ pet.nome }}" required>
+    </div>
+    <br>
+    <div>
+        <label>Espécie:</label><br>
+        <input type="text" name="especie" value="{{ pet.especie }}" required>
+    </div>
+    <br>
+    <div>
+        <label>Raça:</label><br>
+        <input type="text" name="raca" value="{{ pet.raca }}" required>
+    </div>
+    <br>
+    <div>
+        <label>Idade (anos):</label><br>
+        <input type="number" name="idade" value="{{ pet.idade }}" min="0" required>
+    </div>
+    <br>
+    <div>
+        <label>Nome do Tutor/Dono:</label><br>
+        <input type="text" name="dono" value="{{ pet.dono }}" required>
+    </div>
+    <br>
+    <div>
+        <label>Telefone do Tutor:</label><br>
+        <input type="text" name="telefone_dono" value="{{ pet.telefone_dono }}" required>
+    </div>
+    <br>
+    <button type="submit"
+        style="background-color: #087f23; color: white; padding: 8px 16px; border: none; cursor: pointer;">Salvar
+        Alterações</button>
+    <a href="{% url 'visualizar_petis' %}" style="margin-left: 10px;">Cancelar</a>
+</form>
+{% endblock %}

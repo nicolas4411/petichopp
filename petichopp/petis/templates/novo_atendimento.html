@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Novo Atendimento</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Seleção do Pet -->
+        <div class="mb-3">
+            <label for="pet" class="form-label">Pet:</label>
+            <select name="pet" id="pet" class="form-select" required>
+                <option value="">Selecione um Pet...</option>
+                {% for pet in pets %}
+                <option value="{{ pet.id }}">{{ pet.nome }} (Tutor: {{ pet.dono }})</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Data do Atendimento -->
+        <div class="mb-3">
+            <label for="data" class="form-label">Data:</label>
+            <input type="date" name="data" id="data" class="form-control" required>
+        </div>
+
+        <!-- Lista de Serviços Fixos Cadastrados -->
+        <div class="mb-3">
+            <label class="form-label font-weight-bold">Serviços Cadastrados:</label>
+            <div class="card p-3 mb-3">
+                {% if servicos %}
+                {% for servico in servicos %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input servico-checkbox" type="checkbox" value="{{ servico.preco_padrao }}"
+                        data-nome="{{ servico.nome }}" id="servico_{{ servico.id }}" onchange="recalcularTudo()">
+                    <label class="form-check-label" for="servico_{{ servico.id }}">
+                        <strong>{{ servico.nome }}</strong> - R$ {{ servico.preco_padrao }}
+                    </label>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted m-0">Nenhum serviço fixo cadastrado.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Serviços Extras / Personalizados (Adicionados Dinamicamente) -->
+        <div class="mb-3">
+            <label class="form-label font-weight-bold">Serviços Adicionais / Personalizados:</label>
+            <div id="lista-servicos-extras">
+                <!-- Linhas adicionais vão aparecer aqui -->
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="adicionarLinhaServicoExtra()">
+                + Adicionar outro serviço
+            </button>
+        </div>
+
+        <!-- Descrição dos Serviços Selecionados (Gerado Automático ou Editável) -->
+        <div class="mb-3">
+            <label for="servicos_descricao" class="form-label">Resumo dos Serviços Realizados:</label>
+            <textarea name="servicos_descricao" id="servicos_descricao" class="form-control" rows="2"
+                placeholder="Resumo automático dos serviços..."></textarea>
+        </div>
+
+        <!-- BLOCO DE VALORES, DESCONTO (%) E FORMA DE PAGAMENTO -->
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="valor_total" class="form-label">Subtotal (R$):</label>
+                <input type="number" step="0.01" name="valor_total" id="valor_total" class="form-control"
+                    placeholder="0.00" oninput="calcularTotalFinal()" required>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="desconto" class="form-label">Desconto (%):</label>
+                <input type="number" step="0.01" name="desconto" id="desconto" class="form-control" placeholder="0"
+                    value="0" min="0" max="100" oninput="calcularTotalFinal()">
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label class="form-label">Valor Final (R$):</label>
+                <input type="text" id="valor_calculado_exibicao" class="form-control bg-light" value="R$ 0.00" readonly>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="forma_pagamento" class="form-label">Forma de Pagamento:</label>
+                <select name="forma_pagamento" id="forma_pagamento" class="form-select" required>
+                    <option value="PIX">PIX</option>
+                    <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+                    <option value="CARTAO_DEBITO">Cartão de Débito</option>
+                    <option value="DINHEIRO">Dinheiro</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Observações Gerais -->
+        <div class="mb-3">
+            <label for="observacoes" class="form-label">Observações Gerais:</label>
+            <textarea name="observacoes" id="observacoes" class="form-control" rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar Atendimento</button>
+    </form>
+</div>
+
+<!-- Scripts JavaScript para adicionar itens dinâmicos e fazer a soma automática -->
+<script>
+    function adicionarLinhaServicoExtra() {
+        let container = document.getElementById('lista-servicos-extras');
+        let index = container.children.length;
+
+        let div = document.createElement('div');
+        div.className = 'row mb-2 extra-item';
+        div.id = 'extra_row_' + index;
+        div.innerHTML = `
+        <div class="col-md-7">
+            <input type="text" class="form-control extra-nome" placeholder="Nome do Serviço Adicional" oninput="recalcularTudo()">
+        </div>
+        <div class="col-md-4">
+            <input type="number" step="0.01" class="form-control extra-preco" placeholder="Valor (R$)" oninput="recalcularTudo()">
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removerLinhaServicoExtra('extra_row_${index}')">X</button>
+        </div>
+    `;
+        container.appendChild(div);
+    }
+
+    function removerLinhaServicoExtra(id) {
+        let elem = document.getElementById(id);
+        if (elem) {
+            elem.remove();
+            recalcularTudo();
+        }
+    }
+
+    function recalcularTudo() {
+        let total = 0;
+        let nomes = [];
+
+        // 1. Serviços Fixos marcados
+        let checkboxes = document.querySelectorAll('.servico-checkbox:checked');
+        checkboxes.forEach(function (cb) {
+            total += parseFloat(cb.value) || 0;
+            nomes.push(cb.getAttribute('data-nome'));
+        });
+
+        // 2. Serviços Extras / Manualmente Adicionados
+        let extrasNomes = document.querySelectorAll('.extra-nome');
+        let extrasPrecos = document.querySelectorAll('.extra-preco');
+
+        extrasNomes.forEach(function (inputNome, i) {
+            let valor = parseFloat(extrasPrecos[i].value) || 0;
+            let nomeServico = inputNome.value.trim();
+
+            if (nomeServico || valor > 0) {
+                total += valor;
+                if (nomeServico) {
+                    nomes.push(nomeServico);
+                }
+            }
+        });
+
+        document.getElementById('valor_total').value = total.toFixed(2);
+        document.getElementById('servicos_descricao').value = nomes.join(', ');
+
+        calcularTotalFinal();
+    }
+
+    function calcularTotalFinal() {
+        let subtotal = parseFloat(document.getElementById('valor_total').value) || 0;
+        let descontoPct = parseFloat(document.getElementById('desconto').value) || 0;
+
+        let valorDesconto = subtotal * (descontoPct / 100);
+        let valorFinal = Math.max(0, subtotal - valorDesconto);
+
+        document.getElementById('valor_calculado_exibicao').value = 'R$ ' + valorFinal.toFixed(2);
+    }
+</script>
+{% endblock %}

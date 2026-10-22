@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetiChopp</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR PRINCIPAL -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="{% url 'visualizar_petis' %}">
+                <i class="bi bi-shop"></i> PetiChopp
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <!-- LINKS VISÍVEIS PARA VENDEDORES E ADMINS -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'visualizar_petis' %}">
+                            <i class="bi bi-heart-pulse"></i> Pets
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cadastrar_pet' %}">
+                            <i class="bi bi-plus-circle"></i> Cadastrar Pet
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'novo_atendimento' %}">
+                            <i class="bi bi-journal-plus"></i> Novo Atendimento
+                        </a>
+                    </li>
+
+                    <!-- MENU EXCLUSIVO PARA ADMINISTRADOR / STAFF -->
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'historico_atendimentos' %}">
+                            <i class="bi bi-clock-history"></i> Histórico
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" id="adminDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-shield-lock-fill"></i> Administração
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="adminDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'cadastrar_funcionario' %}">
+                                    <i class="bi bi-person-plus-fill"></i> Cadastrar Vendedor
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'cadastrar_administrador' %}">
+                                    <i class="bi bi-shield-plus"></i> Cadastrar Administrador
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'gerenciar_servicos' %}">
+                                    <i class="bi bi-gear-fill"></i> Gerenciar Serviços
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-success fw-bold"
+                                    href="{% url 'financeiro:confirmar_senha' %}">
+                                    <i class="bi bi-cash-stack"></i> Painel Financeiro
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <!-- ÁREA DO VENDEDOR LOGADO, ALTERAÇÃO DE SENHA & LOGOUT -->
+                {% if user.is_authenticated %}
+                <div class="d-flex align-items-center text-white gap-2">
+                    <span class="badge bg-secondary p-2 fs-6">
+                        <i class="bi bi-person-circle"></i> Usuário:
+                        <strong>
+                            {% if user.first_name %}
+                            {{ user.first_name }}
+                            {% elif user.get_full_name %}
+                            {{ user.get_full_name }}
+                            {% else %}
+                            {{ user.username }}
+                            {% endif %}
+                        </strong>
+                    </span>
+                    <a href="{% url 'alterar_senha' %}" class="btn btn-outline-light btn-sm"
+                        title="Alterar Minha Senha">
+                        <i class="bi bi-key-fill"></i> Alterar Senha
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-right"></i> Sair
+                    </a>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL DAS PÁGINAS -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

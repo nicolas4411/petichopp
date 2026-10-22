@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Pet - PetiChopp{% endblock %}
+
+{% block content %}
+<h2>🐾 Cadastrar Pet</h2>
+
+{% if erro %}
+<div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <strong>⚠️ Alerta de Duplicidade:</strong> {{ erro }}
+
+    <div style="margin-top: 15px; background: white; padding: 10px; border-radius: 5px;">
+        <p><strong>Ações para o registro existente:</strong></p>
+        <a href="{% url 'editar_pet' pet_existente.id %}"
+            style="background: #ffc107; color: black; padding: 6px 12px; text-decoration: none; border-radius: 4px; margin-right: 5px;">
+            ✏️ Atualizar Registro
+        </a>
+        <a href="{% url 'alternar_status_pet' pet_existente.id %}"
+            style="background: #17a2b8; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; margin-right: 5px;">
+            {% if pet_existente.ativo %}🚫 Marcar como Inativo{% else %}✅ Marcar como Ativo{% endif %}
+        </a>
+        <a href="{% url 'deletar_pet' pet_existente.id %}"
+            onclick="return confirm('Tem certeza que deseja excluir permanentemente este pet?');"
+            style="background: #dc3545; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px;">
+            🗑️ Excluir Permanente
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    <div>
+        <label>Nome do Pet:</label><br>
+        <input type="text" name="nome" value="{{ form_data.nome }}" required>
+    </div>
+    <br>
+    <div>
+        <label>Espécie:</label><br>
+        <input type="text" name="especie" value="{{ form_data.especie }}" placeholder="Ex: Cão, Gato" required>
+    </div>
+    <br>
+    <div>
+        <label>Raça:</label><br>
+        <input type="text" name="raca" value="{{ form_data.raca }}" placeholder="Ex: SRD, Poodle" required>
+    </div>
+    <br>
+    <div>
+        <label>Idade (anos):</label><br>
+        <input type="number" name="idade" value="{{ form_data.idade }}" min="0" required>
+    </div>
+    <br>
+    <div>
+        <label>Nome do Tutor/Dono:</label><br>
+        <input type="text" name="dono" value="{{ form_data.dono }}" required>
+    </div>
+    <br>
+    <div>
+        <label>Telefone do Tutor:</label><br>
+        <input type="text" name="telefone_dono" value="{{ form_data.telefone_dono }}" placeholder="Ex: (11) 99999-9999"
+            required>
+    </div>
+    <br>
+    <button type="submit">Salvar Pet</button>
+</form>
+{% endblock %}
